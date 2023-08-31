@@ -44,7 +44,12 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as syn::DeriveInput);
     let data_struct = match &input.data {
         Data::Struct(ds) => ds,
-        _ => panic!("Only structs are supported for this buider macro"),
+        _ => {
+            return TokenStream::from(syn::Error::into_compile_error(syn::Error::new_spanned(
+                &input,
+                "only structs are supported for the `Builder` macro",
+            )))
+        }
     };
 
     let target_type_ident = &input.ident;
