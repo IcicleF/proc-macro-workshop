@@ -1,23 +1,39 @@
 error: error number 0
-  --> tests/03-expand-four-errors.rs:20:5
+  --> tests/03-expand-four-errors.rs:19:1
    |
-20 |     compile_error!(concat!("error number ", stringify!(N)));
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+19 | / seq!(N in 0..4 {
+20 | |     compile_error!(concat!("error number ", stringify!(N)));
+21 | | });
+   | |__^
+   |
+   = note: this error originates in the macro `seq` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: error number 1
-  --> tests/03-expand-four-errors.rs:20:5
+  --> tests/03-expand-four-errors.rs:19:1
    |
-20 |     compile_error!(concat!("error number ", stringify!(N)));
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+19 | / seq!(N in 0..4 {
+20 | |     compile_error!(concat!("error number ", stringify!(N)));
+21 | | });
+   | |__^
+   |
+   = note: this error originates in the macro `seq` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: error number 2
-  --> tests/03-expand-four-errors.rs:20:5
+  --> tests/03-expand-four-errors.rs:19:1
    |
-20 |     compile_error!(concat!("error number ", stringify!(N)));
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+19 | / seq!(N in 0..4 {
+20 | |     compile_error!(concat!("error number ", stringify!(N)));
+21 | | });
+   | |__^
+   |
+   = note: this error originates in the macro `seq` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: error number 3
-  --> tests/03-expand-four-errors.rs:20:5
+  --> tests/03-expand-four-errors.rs:19:1
    |
-20 |     compile_error!(concat!("error number ", stringify!(N)));
-   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+19 | / seq!(N in 0..4 {
+20 | |     compile_error!(concat!("error number ", stringify!(N)));
+21 | | });
+   | |__^
+   |
+   = note: this error originates in the macro `seq` (in Nightly builds, run with -Z macro-backtrace for more info)
