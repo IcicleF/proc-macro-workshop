@@ -161,11 +161,24 @@ impl Body {
 
     /// Construct the part into a [`proc_macro2::TokenStream`].
     /// Should only be called from `Part`.
-    fn as_token_stream(&self, has_delimiter: bool) -> TokenStream2 {
+    fn as_token_stream(&self, has_delimiter: bool, seq: &Seq) -> TokenStream2 {
         let body = self
             .parts
             .iter()
-            .map(|part| part.as_token_stream())
+            .enumerate()
+            .map(|(i, part)| {
+                if i % 2 == 0 {
+                    part.as_token_stream(seq)
+                } else {
+                    seq.range()
+                        .map(|idx| {
+                            let mut part = part.clone();
+                            part.substitute_ident(&seq.ident, idx);
+                            part.as_token_stream(seq)
+                        })
+                        .collect()
+                }
+            })
             .collect();
         if has_delimiter {
             let body = Group::new(self.delimiter, body);
@@ -244,11 +257,11 @@ impl Part {
     }
 
     /// Construct the part into a [`proc_macro2::TokenStream`].
-    fn as_token_stream(&self) -> TokenStream2 {
+    fn as_token_stream(&self, seq: &Seq) -> TokenStream2 {
         self.elems
             .iter()
             .map(|elem| match elem {
-                Elem::Body(body) => body.as_token_stream(true),
+                Elem::Body(body) => body.as_token_stream(true, seq),
                 Elem::Tokens(tokens) => tokens.clone(),
             })
             .collect()
@@ -269,10 +282,10 @@ struct Seq {
     ident: Ident,
 
     /// The start (inclusive) of the sequence.
-    start: LitInt,
+    start: usize,
 
     /// The end (exclusive) of the sequence.
-    end: LitInt,
+    end: usize,
 
     /// The body of the sequence.
     body: Body,
@@ -280,20 +293,20 @@ struct Seq {
 
 impl Seq {
     fn range(&self) -> Range<usize> {
-        let start = self.start.base10_parse::<usize>().unwrap();
-        let end = self.end.base10_parse::<usize>().unwrap();
-        start..end
+        self.start..self.end
     }
 
     fn as_token_stream(&self) -> TokenStream2 {
         if self.body.is_repeat_pattern_present() {
-            self.body.as_token_stream(false)
+            // If there is a `#( ... )*` pattern in the body, repeat the body.
+            self.body.as_token_stream(false, self)
         } else {
+            // Else, repeat the whole block.
             self.range()
                 .map(|idx| {
                     let mut body = self.body.clone();
                     body.substitute_ident(&self.ident, idx);
-                    body.as_token_stream(false)
+                    body.as_token_stream(false, self)
                 })
                 .collect()
         }
@@ -304,9 +317,17 @@ impl Parse for Seq {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let ident = input.parse()?;
         input.parse::<Token![in]>()?;
-        let start = input.parse()?;
+        let start = input.parse::<LitInt>()?.base10_parse::<usize>()?;
         input.parse::<Token![..]>()?;
-        let end = input.parse()?;
+
+        // Handle `..=` syntax.
+        let lookahead = input.lookahead1();
+        let end = if lookahead.peek(Token![=]) {
+            input.parse::<Token![=]>()?;
+            input.parse::<LitInt>()?.base10_parse::<usize>()? + 1
+        } else {
+            input.parse::<LitInt>()?.base10_parse::<usize>()?
+        };
 
         let body;
         syn::braced!(body in input);
