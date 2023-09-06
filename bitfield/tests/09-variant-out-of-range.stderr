@@ -1,7 +1,15 @@
-error[E0277]: the trait bound `bitfield::checks::False: bitfield::checks::DiscriminantInRange` is not satisfied
+error[E0277]: the trait bound `DeliveryModeDiscriminant<8>: DeliveryModeDiscriminantInRange` is not satisfied
   --> tests/09-variant-out-of-range.rs:17:5
    |
 17 |     External,
-   |     ^^^^^^^^ the trait `bitfield::checks::DiscriminantInRange` is not implemented for `bitfield::checks::False`
+   |     ^^^^^^^^ the trait `DeliveryModeDiscriminantInRange` is not implemented for `DeliveryModeDiscriminant<8>`
    |
-   = help: the trait `bitfield::checks::DiscriminantInRange` is implemented for `bitfield::checks::True`
+   = help: the following other types implement trait `DeliveryModeDiscriminantInRange`:
+             DeliveryModeDiscriminant<0>
+             DeliveryModeDiscriminant<1>
+             DeliveryModeDiscriminant<2>
+             DeliveryModeDiscriminant<3>
+             DeliveryModeDiscriminant<4>
+             DeliveryModeDiscriminant<5>
+             DeliveryModeDiscriminant<6>
+             DeliveryModeDiscriminant<7>
